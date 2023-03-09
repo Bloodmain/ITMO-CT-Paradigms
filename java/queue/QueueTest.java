@@ -16,6 +16,9 @@ public final class QueueTest {
             .variant("Base", variant(QueueModel.class, d -> () -> d))
             .variant("Contains", variant(ContainsModel.class, d -> () -> d, CONTAINS))
             .variant("Nth", variant(NthModel.class, d -> () -> d, NTH))
+            .variant("Count", variant(CountModel.class, d -> () -> d, COUNT))
+            .variant("Index", variant(IndexModel.class, d -> () -> d, INDEX))
+
             ;
 
     private QueueTest() {

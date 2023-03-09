@@ -363,5 +363,36 @@ public final class Queues {
 
     /* package-private */ static final Queues.LinearTester<ToStrModel> TO_STR = (tester, queue, random) -> queue.toStr();
 
+    // === Count
+
+    /* package-private */ interface CountModel extends ReflectionModel {
+        default int count(final Object element) {
+            return reduce(0, element, (v, i) -> v + 1);
+        }
+    }
+
+    /* package-private */ static final Queues.LinearTester<CountModel> COUNT =
+            (tester, queue, random) -> queue.count(tester.randomElement(random));
+
+    /* package-private */
+    interface IndexModel extends ReflectionModel {
+        default int indexOf(final Object element) {
+            return reduce(-1, element, (v, i) -> v == -1 ? i : v);
+        }
+
+        default int lastIndexOf(final Object element) {
+            return reduce(-1, element, (v, i) -> i);
+        }
+    }
+
+    /* package-private */ static final Queues.LinearTester<IndexModel> INDEX = (tester, queue, random) -> {
+        if (random.nextBoolean()) {
+            queue.indexOf(tester.randomElement(random));
+        } else {
+            queue.lastIndexOf(tester.randomElement(random));
+        }
+    };
+
+
 
 }
