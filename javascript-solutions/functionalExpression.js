@@ -20,9 +20,12 @@ const operations = {
 
 const availableVariables = [
     'x', 'y', 'z'
-]
+];
 
-let parse = expr => (x, y, z) => parseImpl(expr.trim().split(' '))(x, y, z);
+let parse = expr => {
+    let parsedExpr = parseImpl(expr.trim().split(' '));
+    return (x, y, z) => parsedExpr(x, y, z);
+}
 let parseImpl = elements => {
     let lastElement;
     do {

@@ -1,6 +1,5 @@
 package queue;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 /*
@@ -61,11 +60,6 @@ public class ArrayQueue extends AbstractQueue {
         if (queue.length < capacity) {
             int newLength = Math.max(queue.length * 2, capacity);
             Object[] newQueue = new Object[newLength];
-
-            // A B .... C D
-            // C D A B ......
-
-            // :NOTE: копировать подотрезками, а не поэлементно
             for (int i = 0; i < size; ++i) {
                 newQueue[i] = queue[head];
                 head = modLength(++head);
