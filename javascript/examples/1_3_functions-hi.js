@@ -123,6 +123,13 @@ example("addC(10)(20)");
 example("add10(20)");
 
 
+section("uncurry");
+
+const uncurry = f => (a, b) => f(a)(b);
+const addU = uncurry(a => b => a + b);
+example("addU(10, 20)");
+
+
 section("mCurry");
 
 let mCurry = f => a => (...args) => f(...[a, ...args]);

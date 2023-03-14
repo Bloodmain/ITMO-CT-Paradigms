@@ -3,6 +3,8 @@ package jstest.functional;
 import base.Selector;
 import jstest.expression.Builder;
 
+import static jstest.expression.Operations.*;
+
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
@@ -24,6 +26,8 @@ public final class FunctionalTest {
 
     public static final Selector SELECTOR = selector()
             .variant("Base")
+            .variant("OneFP",       ONE,  TWO,  FLOOR,    CEIL, MADD)
+            .variant("OneArgMinMax",   ONE, TWO, argMin(3),   argMin(5), argMax(3), argMax(5))
             .selector();
 
     public static void main(final String... args) {

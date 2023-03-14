@@ -41,6 +41,9 @@ public final class ExpressionTest {
     }
 
     public static final Selector SELECTOR = new Selector(ExpressionTest.class, "easy", "hard")
+            .variant("Mini", v(Path.of("functionalMiniExpression.js"), new AbstractTests() {{
+                tests(c(10), variable("x", 0));
+            }}))
             .variant("base", v(SCRIPT, new AbstractTests() {{
                 final TestExpression vx = variable("x", 0);
 
@@ -49,15 +52,17 @@ public final class ExpressionTest {
                 binary("-", (a, b) -> a - b);
                 binary("*", (a, b) -> a * b);
                 binary("/", (a, b) -> a / b);
+                unary("negate", a -> -a);
 
                 tests(
                         c(10),
                         vx,
+                        f("negate", vx),
                         f("+", vx, c(2)),
                         f("-", c(3), vx),
                         f("*", c(4), vx),
                         f("/", c(5), vx),
-                        f("/", vx, f("*", f("+", vx, c(1)), vx)),
+                        f("/", vx, f("*", f("+", vx, f("negate", c(1))), vx)),
                         f("+", f("+", f("*", vx, vx), f("*", vx, vx)), f("*", vx, vx)),
                         f("-", f("+", f("*", vx, vx), f("*", c(5), f("*", vx, f("*", vx, vx)))), f("*", vx, c(8)))
                 );
