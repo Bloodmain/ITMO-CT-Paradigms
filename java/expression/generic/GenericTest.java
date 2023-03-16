@@ -147,8 +147,27 @@ public final class GenericTest {
             .binary("mod", (a, b) -> s(a % b))
             ;
 
+    @SuppressWarnings("Convert2MethodRef")
+    private static final Mode<Float> FLOAT = mode("f", c -> (float) c)
+            .binary("+", (a, b) -> a + b)
+            .binary("-", (a, b) -> a - b)
+            .binary("*", (a, b) -> a * b)
+            .binary("/", (a, b) -> a / b)
+            .unary("-", a -> -a)
+
+            .unary("abs", Math::abs)
+            .unary("square", a -> a * a)
+            .binary("mod", (a, b) -> a % b)
+
+            .unary("count", a -> (float) Integer.bitCount(Float.floatToIntBits(a)))
+            .binary("min", Math::min)
+            .binary("max", Math::max)
+            ;
+
+
     public static final Selector SELECTOR = Selector.composite(GenericTest.class, GenericTester::new, "easy", "hard")
             .variant("Base", INTEGER_CHECKED, DOUBLE, BIG_INTEGER, ADD, SUBTRACT, MULTIPLY, DIVIDE, NEGATE)
+            .variant("Ufs", INTEGER_UNCHECKED, FLOAT, SHORT)
             .variant("AsmUls", ABS, SQUARE, MOD, INTEGER_UNCHECKED, LONG, SHORT)
             .variant("AsmUps", ABS, SQUARE, MOD, INTEGER_UNCHECKED, INTEGER_PRIME, SHORT)
             .selector();
