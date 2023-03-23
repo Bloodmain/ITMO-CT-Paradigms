@@ -19,13 +19,17 @@ public interface Operations {
         checker.any("/", "Divide", 1, 2, arith(1, (a, b) -> a / b));
     };
 
+
+    // OneTwo
     Operation ONE = constant("one", 1);
     Operation TWO = constant("two", 2);
 
+    // FP
     Operation MADD = fixed("madd", "*+", 3, args -> args[0] * args[1] + args[2], null);
     Operation FLOOR = unary("floor", "_", Math::floor, null);
     Operation CEIL = unary("ceil", "^", Math::ceil, null);
 
+    // ArgMinMax
     static Operation argMin(final int arity) {
         return arg(arity, "Min", DoubleStream::min);
     }
@@ -48,6 +52,35 @@ public interface Operations {
                     .findFirst();
         });
     }
+
+    // Sumsq, Distance
+    private static double sumsq(final double... args) {
+        return Arrays.stream(args).map(a -> a * a).sum();
+    }
+
+    static Operation sumsq(final int arity, final int[][] simplifications) {
+        return fix("sumsq", "Sumsq", arity, Operations::sumsq, simplifications);
+    }
+
+    static Operation distance(final int arity, final int[][] simplifications) {
+        return fix("distance", "Distance", arity, args -> Math.sqrt(sumsq(args)), simplifications);
+    }
+
+    // Sumrec, hmean
+    private static double sumrec(final double... args) {
+        return Arrays.stream(args).map(a -> 1 / a).sum();
+    }
+
+    static Operation sumrec(final int arity, final int[][] simplifications) {
+        return fix("sumrec", "Sumrec", arity, Operations::sumrec, simplifications);
+    }
+
+    static Operation hmean(final int arity, final int[][] simplifications) {
+        return fix("hmean", "HMean", arity, args -> args.length / sumrec(args), simplifications);
+    }
+
+    // Common
+
     private static Operation constant(final String name, final double value) {
         return checker -> checker.constant(name, value);
     }
