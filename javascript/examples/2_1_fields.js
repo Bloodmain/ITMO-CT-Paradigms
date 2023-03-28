@@ -1,6 +1,6 @@
 "use strict";
 
-lecture("2. Objects and Clojures");
+lecture("2. Objects and Closures");
 chapter("Fields");
 section("Objects as associative arrays");
 

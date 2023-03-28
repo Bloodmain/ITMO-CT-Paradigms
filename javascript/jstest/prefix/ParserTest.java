@@ -1,26 +1,20 @@
 package jstest.prefix;
 
 import base.Selector;
-import jstest.ArithmeticTests;
-import jstest.expression.Language;
-import jstest.object.ObjectTester;
+
+import static jstest.expression.Operations.*;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class ParserTest {
-    public static final Selector SELECTOR = Selector.composite(
-            ParserTest.class,
-            counter -> new ParserTester(
-                    counter,
-                    new Language(ObjectTester.OBJECT, ParserTester.PREFIX, new ArithmeticTests()),
-                    "prefix",
-                    "parsePrefix",
-                    "xyz()+*/@ABC"
-            ),
-            "", "easy", "hard"
-    )
+    public static final Selector SELECTOR = Kind.selector(
+                    ParserTest.class,
+                    "prefix", "parsePrefix", ParserTester.PREFIX
+            )
             .variant("Base")
+            .variant("SumexpLSE", SUMEXP, LSE)
+            .variant("MeansqRMS", MEANSQ, RMS)
             .selector();
 
     private ParserTest() {

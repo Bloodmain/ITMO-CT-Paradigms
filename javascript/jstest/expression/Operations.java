@@ -79,6 +79,27 @@ public interface Operations {
         return fix("hmean", "HMean", arity, args -> args.length / sumrec(args), simplifications);
     }
 
+    // Sumexp, LSE
+    private static double sumexp(final double[] args) {
+        return Arrays.stream(args).map(Math::exp).sum();
+    }
+
+    Operation SUMEXP = any("sumexp", "Sumexp", 0, 3, Operations::sumexp);
+    Operation LSE = any("lse", "LSE", 1, 5, args -> Math.log(sumexp(args)));
+
+
+    // MeanSQ, RMS
+
+    private static double meanSq(final double[] args) {
+        return sumsq(args) / args.length;
+    }
+
+    private static double rms(final double[] args) {
+        return Math.sqrt(meanSq(args));
+    }
+    Operation MEANSQ = any("meansq", "Meansq", 0, 3, Operations::meanSq);
+    Operation RMS = any("rms", "RMS", 0, 5, Operations::rms);
+
     // Common
 
     private static Operation constant(final String name, final double value) {
@@ -123,4 +144,15 @@ public interface Operations {
                 : args.length == 1 ? f.applyAsDouble(zero, args[0])
                 : Arrays.stream(args).reduce(f).orElseThrow();
     }
+    Operation SIN = unary("sin", "Sin", Math::sin,
+            new int[][]{{1, 1, 1}, {5, 1, 1}, {9, 14, 1}, {9, 9, 1}, {48, 48, 37}, {27, 23, 23}});
+    Operation COS = unary("cos", "Cos", Math::cos,
+            new int[][]{{1, 1, 1}, {12, 1, 1}, {16, 21, 1}, {16, 16, 1}, {55, 55, 51}, {41, 23, 23}});
+
+
+    Operation SINH = unary("sinh", "Sinh", Math::sinh,
+            new int[][]{{1, 1, 1}, {6, 1, 1}, {10, 15, 1}, {10, 10, 1}, {51, 51, 40}, {30, 21, 21}});
+    Operation COSH = unary("cosh", "Cosh", Math::cosh,
+            new int[][]{{1, 1, 1}, {6, 1, 1}, {10, 15, 1}, {10, 10, 1}, {51, 51, 40}, {30, 22, 22}});
+
 }

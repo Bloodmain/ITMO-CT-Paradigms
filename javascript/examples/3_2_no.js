@@ -2,22 +2,6 @@
 
 chapter("There is not such thing as...");
 
-section("Global variables");
-
-var globalVariable = "Hello";
-example("globalVariable");
-example("global.globalVariable");
-let this_globalVariable = this.globalVariable;
-example("this_globalVariable");
-
-
-section("Global built-ins");
-
-example("global.Object");
-example("global.Infinity");
-example("global.isNaN");
-
-
 section("Block-level variable");
 
 (function() {
@@ -32,3 +16,19 @@ section("Block-level variable");
     }
     println("And outer scope: a ->", a);
 })();
+
+
+section("Global variables");
+
+var globalVariable = "Hello";
+example("globalVariable");
+example("global.globalVariable");
+let this_globalVariable = this.globalVariable;
+example("this_globalVariable");
+
+
+section("Global built-ins");
+
+example("global.Object");
+example("global.Infinity");
+example("global.isNaN");

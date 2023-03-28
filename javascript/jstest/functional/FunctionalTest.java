@@ -28,6 +28,8 @@ public final class FunctionalTest {
             .variant("Base")
             .variant("OneFP",       ONE,  TWO,  FLOOR,    CEIL, MADD)
             .variant("OneArgMinMax",   ONE, TWO, argMin(3),   argMin(5), argMax(3), argMax(5))
+            .variant("OneSinCos",         ONE, TWO,         SIN,      COS)
+            .variant("OneSinhCosh",         ONE, TWO,         SINH,      COSH)
             .selector();
 
     public static void main(final String... args) {

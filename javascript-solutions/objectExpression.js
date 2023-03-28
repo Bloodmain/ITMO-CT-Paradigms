@@ -1,4 +1,7 @@
 class Operation {
+    operands;
+    symbol;
+
     constructor() {
     }
 
@@ -6,12 +9,32 @@ class Operation {
         return this.evaluatingRule(...this.operands.map(el => el.evaluate(x, y, z)));
     }
 
+    operandsToString(stringFunction) {
+        return this.operands.map(x => x[stringFunction]()).join(" ");
+    }
+
     toString() {
-        return this.operands.map(x => x.toString()).reduce((a, b) => a + " " + b) + " " + this.symbol;
+        return this.operandsToString("toString") + " " + this.symbol;
     }
 
     prefix() {
-        return "(" + this.symbol + " " + this.operands.map(x => x.prefix()).reduce((a, b) => a + " " + b) + ")";
+        return "(" + this.symbol + " " + this.operandsToString("prefix") + ")";
+    }
+
+    postfix() {
+        return "(" + this.operandsToString("postfix") + " " + this.symbol + ")";
+    }
+}
+
+class ComposedOperation extends Operation {
+    composedFrom;
+
+    evaluate(x, y, z) {
+        return this.composedFrom.evaluate(x, y, z);
+    }
+
+    diff(by) {
+        return this.composedFrom.diff(by);
     }
 }
 
@@ -23,7 +46,7 @@ class Add extends Operation {
     }
 
     evaluatingRule(...terms) {
-        return terms.reduce((a, b) => a + b);
+        return terms.reduce((a, b) => a + b, 0);
     }
 
     diff(by) {
@@ -122,6 +145,7 @@ class Const {
     }
 
     prefix = this.toString;
+    postfix = this.toString;
 }
 
 const AVAILABLE_VARIABLES = [
@@ -146,22 +170,15 @@ class Variable {
     }
 
     prefix = this.toString;
+    postfix = this.toString;
 }
 
-class SumrecN extends Operation {
+class SumrecN extends ComposedOperation {
     constructor(...operands) {
         super();
         this.operands = operands;
         this.symbol = 'sumrec' + operands.length;
-        this.exprItself = new Add(...operands.map(a => new Divide(new Const(1), a)));
-    }
-
-    evaluate(x, y, z) {
-        return this.exprItself.evaluate(x, y, z);
-    }
-
-    diff(by) {
-        return this.exprItself.diff(by);
+        this.composedFrom = new Add(...operands.map(a => new Divide(new Const(1), a)));
     }
 }
 
@@ -189,20 +206,12 @@ class Sumrec5 extends SumrecN {
     }
 }
 
-class HMeanN extends Operation {
+class HMeanN extends ComposedOperation {
     constructor(...operands) {
         super();
         this.operands = operands;
         this.symbol = 'hmean' + operands.length;
-        this.exprItself = new Divide(new Const(operands.length), new SumrecN(...operands));
-    }
-
-    evaluate(x, y, z) {
-        return this.exprItself.evaluate(x, y, z);
-    }
-
-    diff(by) {
-        return this.exprItself.diff(by);
+        this.composedFrom = new Divide(new Const(operands.length), new SumrecN(...operands));
     }
 }
 
@@ -230,6 +239,55 @@ class HMean5 extends HMeanN {
     }
 }
 
+class Square extends ComposedOperation {
+    constructor(operand) {
+        super();
+        this.operands = [operand];
+        this.symbol = 'square';
+        this.composedFrom = new Multiply(operand, operand);
+    }
+}
+
+class SquareRoot extends Operation {
+    constructor(operand) {
+        super();
+        this.operands = [operand];
+        this.symbol = 'sqrt';
+    }
+
+    evaluatingRule(operand) {
+        return Math.sqrt(operand);
+    }
+
+    diff(by) {
+        return new Divide(
+            this.operands[0].diff(by),
+            new Multiply(new Const(2), this)
+        );
+    }
+}
+
+class Meansq extends ComposedOperation {
+    constructor(...operands) {
+        super();
+        this.operands = operands;
+        this.symbol = 'meansq';
+        this.composedFrom = new Divide(
+            new Add(...operands.map(el => new Square(el))),
+            new Const(this.operands.length)
+        );
+    }
+}
+
+class RMS extends ComposedOperation {
+    constructor(...operands) {
+        super();
+        this.operands = operands;
+        this.symbol = 'rms';
+        this.composedFrom = new SquareRoot(new Meansq(...operands));
+    }
+}
+
 const OPERATIONS = {
     '+': [Add, 2],
     '-': [Subtract, 2],
@@ -244,7 +302,10 @@ const OPERATIONS = {
     'hmean3': [HMean3, 3],
     'hmean4': [HMean4, 4],
     'hmean5': [HMean5, 5],
+    'meansq': [Meansq, -1],
+    'rms': [RMS, -1]
 };
+
 
 let parse = expr => {
     return parseImpl(expr.trim().split(/\s+/));
@@ -271,21 +332,19 @@ class ParseError extends Error {
 }
 
 class Reader {
+    static END = '\0';
+
     constructor(string) {
         this.string = string;
         this.position = 0;
     }
 
     test(char) {
-        if (!this.checkEOF()) {
-            return this.string[this.position] === char;
-        }
+        return !this.checkEOF() && this.string[this.position] === char;
     }
 
     nextChar() {
-        if (!this.checkEOF()) {
-            return this.string[this.position++];
-        }
+        return this.checkEOF() ? Reader.END : this.string[this.position++];
     }
 
     checkEOF() {
@@ -303,10 +362,11 @@ class Reader {
     }
 }
 
-class PrefixParser extends Reader {
+class ExprParser extends Reader {
 
-    constructor(expr) {
+    constructor(expr, dialectOperatorIndex) {
         super(expr);
+        this.dialectOperatorIndex = dialectOperatorIndex;
     }
 
     parse() {
@@ -322,7 +382,8 @@ class PrefixParser extends Reader {
         this.trim();
         if (this.test('(')) {
             this.nextChar();
-            let parsedExpr = this.parseParentheses();
+            this.trim();
+            let parsedExpr = this.parseOperation();
             this.trim();
             if (!this.test(')')) {
                 throw new ParseError("expected ')', but found '" + this.nextChar() + "'", this.getPos());
@@ -333,22 +394,33 @@ class PrefixParser extends Reader {
         return this.parseExpr();
     }
 
-    parseExpr() {
-        this.trim();
-        let currentToken = this.parseToken();
+    parseOperation() {
+        let tokens = this.parseOperands();
+        let operation = tokens.at(this.dialectOperatorIndex);
+        if (operation === undefined) {
+            throw new ParseError("expected operation at pos " + this.dialectOperatorIndex +
+                ", but there are too few operands", this.getPos());
+        }
+        if (operation in OPERATIONS) {
+            tokens.splice(this.dialectOperatorIndex, 1);
+            if (!this.checkOperandsNumber(operation, tokens.length)) {
+                throw new ParseError("unexpected number of operands for '" + operation
+                    + "', found " + tokens.length, this.getPos());
+            }
+            return new OPERATIONS[operation][0](...tokens);
+        } else {
+            throw new ParseError("expected operation, found: '" + operation + "'", this.getPos())
+        }
+    }
 
+    parseExpr() {
+        let currentToken = this.parseToken();
         if (AVAILABLE_VARIABLES.includes(currentToken)) {
             return new Variable(currentToken);
         } else if (currentToken && !isNaN(currentToken)) {
             return new Const(parseInt(currentToken));
         } else if (currentToken in OPERATIONS) {
-            let operands = this.parseOperands();
-            if (!((OPERATIONS[currentToken][1] === -1 && operands.length > 0) ||
-                operands.length === OPERATIONS[currentToken][1])) {
-                throw new ParseError("unexpected number of operands for '" + currentToken
-                    + "', found " + operands.length, this.getPos());
-            }
-            return new OPERATIONS[currentToken][0](...operands);
+            return currentToken;
         } else {
             throw new ParseError("unexpected token '" + currentToken + "'", this.getPos());
         }
@@ -364,12 +436,26 @@ class PrefixParser extends Reader {
 
     parseOperands() {
         let operands = [];
+        let operationFound = false;
         while (!this.checkEOF() && !this.test(')')) {
-            operands.push(this.parseParentheses());
+            let operand = this.parseParentheses();
+            if (operand in OPERATIONS) {
+                if (operationFound) {
+                    throw new ParseError("unexpected second operation '" + operand + "'", this.getPos());
+                } else {
+                    operationFound = true;
+                }
+            }
+            operands.push(operand);
             this.trim();
         }
         return operands;
     }
+
+    checkOperandsNumber(operation, operandsCount) {
+        return operandsCount === OPERATIONS[operation][1] || (OPERATIONS[operation][1] === -1);
+    }
 }
 
-let parsePrefix = expr => new PrefixParser(expr).parse();
+let parsePrefix = expr => new ExprParser(expr, 0).parse();
+let parsePostfix = expr => new ExprParser(expr, -1).parse();

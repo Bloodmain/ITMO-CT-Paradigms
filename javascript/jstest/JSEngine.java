@@ -2,10 +2,7 @@ package jstest;
 
 import org.graalvm.polyglot.HostAccess;
 
-import javax.script.ScriptContext;
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.io.IOException;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -25,12 +22,21 @@ public final class JSEngine {
             System.setProperty("polyglot.engine.WarnInterpreterOnly", "false");
             System.setProperty("polyglot.js.strict", "true");
 
-            engine = new ScriptEngineManager().getEngineByName("Graal.js");
+            final ScriptEngineManager scriptEngineManager = new ScriptEngineManager();
+//            engine = scriptEngineManager.getEngineFactories().stream()
+//                    .filter(factory -> "Graal.js".equals(factory.getEngineName()))
+//                    .map(ScriptEngineFactory::getScriptEngine)
+//                    .findAny().orElse(null);
+            engine = scriptEngineManager.getEngineByName("Graal.js");
             if (engine == null) {
                 System.err.println("Graal.js not found");
                 System.err.println("Use the following options to run tests:");
                 System.err.println(OPTIONS);
                 System.err.println("Where <js> - path to the javascript directory of this repository");
+                System.err.println("Known engines:");
+                for (final ScriptEngineFactory engineFactory : scriptEngineManager.getEngineFactories()) {
+                    System.out.println("    " + engineFactory.getEngineName());
+                }
                 throw new AssertionError("Graal.js not found");
             }
 

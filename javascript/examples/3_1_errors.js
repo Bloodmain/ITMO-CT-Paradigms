@@ -54,6 +54,8 @@ println();
 section("Custom errors");
 
 function CustomError(message) {
+    // Error is exotic object
+    //Error.call(this, message);
     this.message = message;
 }
 CustomError.prototype = Object.create(Error.prototype);
