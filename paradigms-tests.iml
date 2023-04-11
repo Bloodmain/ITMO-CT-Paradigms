@@ -5,6 +5,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/javascript" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/clojure" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -12,5 +13,7 @@
     <orderEntry type="library" name="graal" level="project" />
     <orderEntry type="library" name="BinarySearchTest" level="project" />
     <orderEntry type="module" module-name="paradigms-solutions" />
+    <orderEntry type="library" name="clojure" level="project" />
+    <orderEntry type="library" name="clojure (2)" level="project" />
   </component>
 </module>

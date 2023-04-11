@@ -18,5 +18,5 @@ javac \
     -encoding utf-8 \
     -d "$OUT" \
     "--class-path=$LIB:$REPO/java:$REPO/javascript:$REPO/clojure" \
-    "$CLOJURE/${CLASS//\./\/}.java" \
+    "$CLOJURE/${CLASS//\.//}.java" \
  && java -ea "--class-path=$LIB:$OUT" "$CLASS" $ARGS

@@ -4,7 +4,6 @@ import base.Asserts;
 import base.Selector;
 import base.TestCounter;
 import cljtest.ClojureScript;
-import cljtest.linear.LinearTester;
 import jstest.Engine;
 
 import java.util.Arrays;
@@ -60,7 +59,7 @@ public final class ExampleTest {
 
     private static final String[] MODES = {"easy", "hard"};
 
-    public static final Selector SELECTOR = new Selector(LinearTester.class, MODES)
+    public static final Selector SELECTOR = new Selector(ExampleTest.class, MODES)
             .variant("base", counter -> new Test(counter).test());
 
     private ExampleTest() {

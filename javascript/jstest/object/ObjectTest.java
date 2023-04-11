@@ -26,6 +26,8 @@ public final class ObjectTest {
 
     public static final Selector SELECTOR = selector()
             .variant("Base")
+            .variant("ExpLn", EXP, LN)
+            .variant("ArcTan", ATAN, ATAN2)
             .variant(
                     "Distance",
                     sumsq(2, new int[][]{{1, 1, 1}, {1, 5, 1}, {5, 1, 1}, {5, 5, 1}, {9, 9, 17}, {17, 14, 9}, {22, 22, 17}, {22, 22, 17}}),

@@ -97,8 +97,8 @@ public interface Operations {
     private static double rms(final double[] args) {
         return Math.sqrt(meanSq(args));
     }
-    Operation MEANSQ = any("meansq", "Meansq", 0, 3, Operations::meanSq);
-    Operation RMS = any("rms", "RMS", 0, 5, Operations::rms);
+    Operation MEANSQ = any("meansq", "Meansq", 1, 3, Operations::meanSq);
+    Operation RMS = any("rms", "RMS", 1, 5, Operations::rms);
 
     // Common
 
@@ -154,5 +154,15 @@ public interface Operations {
             new int[][]{{1, 1, 1}, {6, 1, 1}, {10, 15, 1}, {10, 10, 1}, {51, 51, 40}, {30, 21, 21}});
     Operation COSH = unary("cosh", "Cosh", Math::cosh,
             new int[][]{{1, 1, 1}, {6, 1, 1}, {10, 15, 1}, {10, 10, 1}, {51, 51, 40}, {30, 22, 22}});
+
+    Operation EXP = unary("exp", "Exp", Math::exp,
+            new int[][]{{1, 1, 1}, {5, 1, 1}, {9, 14, 1}, {9, 9, 1}, {48, 48, 37}, {27, 22, 22}});
+    Operation LN = unary("ln", "Ln", Math::log,
+            new int[][]{{1, 1, 1}, {5, 1, 1}, {9, 14, 1}, {9, 9, 1}, {46, 46, 36}, {26, 22, 22}});
+
+    Operation ATAN = unary("atan", "ArcTan", Math::atan,
+            new int[][]{{1, 1, 1}, {13, 1, 1}, {21, 26, 1}, {21, 21, 1}, {71, 71, 67}, {59, 22, 22}});
+    Operation ATAN2 = binary("atan2", "ArcTan2", Math::atan2,
+            new int[][]{{1, 1, 1}, {1, 17, 1}, {16, 1, 1}, {23, 30, 1}, {48, 48, 43}, {50, 46, 41}, {78, 85, 51}, {71, 78, 58}});
 
 }
