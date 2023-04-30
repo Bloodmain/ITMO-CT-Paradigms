@@ -4,6 +4,7 @@ import base.ExtendedRandom;
 import base.Selector;
 import base.TestCounter;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -38,9 +39,30 @@ public final class LinearTest {
         }
     }
 
+    // Shapeless
+    private static final List<Item.Fun> SHAPELESS = Item.functions("s");
+
+    private static Item genShapeless(final ExtendedRandom random, final int complexity) {
+        if (complexity == 0) {
+            return Item.ZERO;
+        }
+        final int[] parts = new int[1 + random.nextInt(Math.min(complexity, 5))];
+        for (int i = parts.length; i < complexity; i++) {
+            parts[random.nextInt(parts.length)]++;
+        }
+        return Item.vector(Arrays.stream(parts).mapToObj(c -> genShapeless(random, c)));
+    }
+
+    private static void shapeless(final Test test) {
+        IntStream.range(0, 100 / TestCounter.DENOMINATOR2)
+                .forEachOrdered(complexity -> test.test(() -> genShapeless(test.random(), complexity)));
+    }
+
+
     // Selector
     public static final Selector SELECTOR = new Selector(LinearTester.class, "easy", "hard")
             .variant("Base", v(LinearTester::new))
+            .variant("Shapeless", variant(SHAPELESS, LinearTest::shapeless))
             .variant("Tensor", variant(TENSOR, LinearTest::tensor))
             .variant("Broadcast", v(BroadcastTester::new))
             ;

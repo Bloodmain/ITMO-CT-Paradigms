@@ -1,8 +1,6 @@
 package jstest.expression;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -13,11 +11,22 @@ public class Dialect {
     private final String variable;
     private final String constant;
     private final BiFunction<String, List<String>, String> nary;
-    private final Map<String, String> aliases;
-    private Function<String, String> renamer = Function.identity();
+    private final Function<String, String> renamer;
+
+    private Dialect(
+            final String variable,
+            final String constant,
+            final BiFunction<String, List<String>, String> nary,
+            final Function<String, String> renamer
+    ) {
+        this.variable = variable;
+        this.constant = constant;
+        this.nary = nary;
+        this.renamer = renamer;
+    }
 
     public Dialect(final String variable, final String constant, final BiFunction<String, List<String>, String> nary) {
-        this(variable, constant, nary, new HashMap<>());
+        this(variable, constant, nary, Function.identity());
     }
 
     public Dialect(final String variable, final String constant, final String operation, final String separator) {
@@ -28,24 +37,8 @@ public class Dialect {
         );
     }
 
-    private Dialect(final String variable, final String constant, final BiFunction<String, List<String>, String> nary, final Map<String, String> aliases) {
-        this.variable = variable;
-        this.constant = constant;
-        this.nary = nary;
-        this.aliases = aliases;
-    }
-
-    public Dialect renamed(final String... renames) {
-        assert renames.length % 2 == 0;
-        for (int i = 0; i < renames.length; i += 2) {
-            aliases.put(renames[i], renames[i + 1]);
-        }
-        return this;
-    }
-
-    public Dialect renamer(final Function<String, String> renamer) {
-        this.renamer = renamer;
-        return this;
+    public Dialect renamed(final Function<String, String> renamer) {
+        return new Dialect(variable, constant, nary, this.renamer.compose(renamer));
     }
 
     public String variable(final String name) {
@@ -61,6 +54,16 @@ public class Dialect {
     }
 
     public String operation(final String name, final List<String> as) {
-        return nary.apply(renamer.apply(aliases.getOrDefault(name, name)), as);
+        return nary.apply(renamer.apply(name), as);
+    }
+
+    public Dialect functional() {
+        return renamed(Dialect::toFunctional);
+    }
+
+    private static String toFunctional(final String name) {
+        return name.chars().allMatch(Character::isUpperCase)
+            ? name.toLowerCase()
+            : Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }
 }

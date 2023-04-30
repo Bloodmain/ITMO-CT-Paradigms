@@ -5,7 +5,6 @@ import base.ExtendedRandom;
 import base.TestCounter;
 import base.Tester;
 import jstest.Engine;
-import jstest.JSEngine;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,9 +140,9 @@ public abstract class BaseTester<X, E extends Engine<X>> extends Tester {
         } else {
             return Arrays.asList(modes).indexOf(args[0]);
         }
-        System.err.println("Usage: java -ea " + JSEngine.OPTIONS + " " + type.getName() + " {" + String.join("|", modes) + "}");
-        System.exit(0);
-        return -1;
+        System.err.println("Usage: java -ea " + type.getName() + " {" + String.join("|", modes) + "}");
+        System.exit(1);
+        throw new AssertionError("Return from System.exit");
     }
 
     public void addStage(final Runnable stage) {

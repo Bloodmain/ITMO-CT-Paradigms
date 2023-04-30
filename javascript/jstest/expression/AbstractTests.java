@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
-public abstract class AbstractTests {
+public abstract class AbstractTests implements Lang {
     private static final int MAX_C = 1_000;
 
     private final ExtendedRandom random = new ExtendedRandom(getClass());
@@ -149,18 +149,22 @@ public abstract class AbstractTests {
         return variables;
     }
 
+    @Override
     public Map<String, Integer> getVariableNames() {
         return variableNames;
     }
 
+    @Override
     public ExtendedRandom random() {
         return random;
     }
 
+    @Override
     public boolean hasVarargs() {
         return operators.values().stream().anyMatch(Operator::isVararg);
     }
 
+    @Override
     public Integer getPriority(final String op) {
         return priorities.get(op);
     }

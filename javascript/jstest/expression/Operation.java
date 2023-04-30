@@ -5,5 +5,5 @@ import java.util.function.Consumer;
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
-public interface Operation extends Consumer<Builder> {
+public interface Operation extends Consumer<OperationsBuilder> {
 }

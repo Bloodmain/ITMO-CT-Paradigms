@@ -12,9 +12,11 @@ public final class ParserTest {
                     ParserTest.class,
                     "prefix", "parsePrefix", ParserTester.PREFIX
             )
-            .variant("Base")
+            .variant("Base", ARITH)
+            .variant("FloorCeil", FLOOR, CEIL)
             .variant("SumexpLSE", SUMEXP, LSE)
             .variant("MeansqRMS", MEANSQ, RMS)
+            .variant("SumAvg", SUM, AVG)
             .selector();
 
     private ParserTest() {

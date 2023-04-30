@@ -13,8 +13,7 @@ import java.nio.file.Path;
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ObjectTester extends JSTester {
-    public static final Dialect OBJECT = new Dialect("new Variable('%s')", "new Const(%s)", "new {op}({args})", ", ")
-            .renamed("+", "Add", "-", "Subtract", "*", "Multiply", "/", "Divide", "negate", "Negate");
+    public static final Dialect OBJECT = new Dialect("new Variable('%s')", "new Const(%s)", "new {op}({args})", ", ");
 
     private static final Diff DIFF = new Diff(2, N, new Dialect(
             "'%s'", "%s",

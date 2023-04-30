@@ -13,3 +13,18 @@
 (load-file "examples/2_3_evaluation-orders.clj")
 (load-file "examples/2_4_streams.clj")
 (load-file "examples/2_5_maps.clj")
+
+(lecture "3. Objects")
+(load-file "examples/3_1_js-objects.clj")
+(load-file "examples/3_2_java-objects.clj")
+(load-file "examples/3_3_mutable-state.clj")
+
+(lecture "4. Parser combinators")
+(load-file "examples/4_1_base.clj")
+(load-file "examples/4_2_combinators.clj")
+(load-file "examples/4_3_json.clj")
+
+(lecture "5. Macros and foundations of math")
+(load-file "examples/5_1_macro.clj")
+(load-file "examples/5_2_parser.clj")
+(load-file "examples/5_3_church.clj")

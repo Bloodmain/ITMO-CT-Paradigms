@@ -137,6 +137,3 @@
 (def tb- (tFn v-))
 (def tb* (tFn v*))
 (def tbd (tFn vd))
-
-;(println (broadcast [[1 2]] '(1 2 3)))
-;(println (tb+ [1] [2]))

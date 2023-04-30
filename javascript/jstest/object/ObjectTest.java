@@ -2,7 +2,8 @@ package jstest.object;
 
 import base.Selector;
 import jstest.expression.Builder;
-import jstest.functional.ExpressionTest;
+import jstest.expression.OperationsBuilder;
+import jstest.functional.FunctionalTest;
 
 import static jstest.expression.Operations.*;
 
@@ -11,13 +12,13 @@ import static jstest.expression.Operations.*;
  */
 public final class ObjectTest {
     /* package-private */
-    static Selector.Composite<Builder> selector() {
+    static Selector.Composite<OperationsBuilder> selector() {
          return Builder.selector(
                 ObjectTest.class,
                 mode -> false,
                 (builder, counter) -> new ObjectTester(
                         counter,
-                        builder.aliased(ObjectTester.OBJECT, ExpressionTest.POLISH),
+                        builder.language(ObjectTester.OBJECT, FunctionalTest.POLISH),
                         "toString", "parse"
                 ),
                 "easy", "", "hard", "bonus"
@@ -25,7 +26,7 @@ public final class ObjectTest {
     }
 
     public static final Selector SELECTOR = selector()
-            .variant("Base")
+            .variant("Base", ARITH)
             .variant("ExpLn", EXP, LN)
             .variant("ArcTan", ATAN, ATAN2)
             .variant(

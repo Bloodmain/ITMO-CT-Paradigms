@@ -1,5 +1,6 @@
 package jstest.expression;
 
+import base.ExtendedRandom;
 import base.Selector;
 import base.TestCounter;
 import base.Tester;
@@ -16,7 +17,7 @@ import static jstest.expression.AbstractTests.c;
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
-public final class Builder {
+public final class Builder implements OperationsBuilder, LanguageBuilder {
     private final ArithmeticTests tests = new ArithmeticTests();
     private final boolean testMulti;
     private final Map<String, String> aliases = new HashMap<>();
@@ -32,16 +33,16 @@ public final class Builder {
         this.testMulti = testMulti;
     }
 
-    public static base.Selector.Composite<Builder> selector(
+    public static Selector.Composite<OperationsBuilder> selector(
             final Class<?> owner,
             final IntPredicate testMulti,
-            final BiFunction<Builder, TestCounter, Tester> tester,
+            final BiFunction<LanguageBuilder, TestCounter, Tester> tester,
             final String... modes
     ) {
         return Selector.composite(
                 owner,
                 counter -> new Builder(testMulti.test(counter.mode())),
-                (builder, counter) -> tester.apply(builder, counter).test(),
+                (builder, counter) -> tester.apply((Builder) builder, counter).test(),
                 modes
         );
     }
@@ -54,6 +55,7 @@ public final class Builder {
         this.tests.tests(simplifications, tests);
     }
 
+    @Override
     public void constant(final String name, final double value) {
         final BaseTester.Func expr = vars -> value;
         tests.nullary(name, expr);
@@ -66,9 +68,25 @@ public final class Builder {
         );
     }
 
-    public void unary(final String name, final String alias, final DoubleUnaryOperator op, final int[][] simplifications) {
+    @Override
+    public void variable(final String name, final int index) {
+        tests.variable(name, index);
+    }
+
+    @Override
+    public ExtendedRandom random() {
+        return getLang().random();
+    }
+
+    @Override
+    public void unary(
+            final String name,
+            final String alias,
+            final DoubleUnaryOperator op,
+            final int[][] simplifications
+    ) {
         tests.unary(name, op);
-        aliases.put(name, alias);
+        alias(name, alias);
         unaryTests(name, simplifications);
     }
 
@@ -83,15 +101,22 @@ public final class Builder {
         );
     }
 
-    public void binary(final String name, final String alias, final DoubleBinaryOperator op, final int[][] simplifications) {
+    @Override
+    public void binary(
+            final String name,
+            final String alias,
+            final DoubleBinaryOperator op,
+            final int[][] simplifications
+    ) {
         tests.binary(name, op);
-        aliases.put(name, alias);
+        alias(name, alias);
         binaryTests(name, simplifications);
     }
 
+    @Override
     public void infix(final String name, final String alias, final int priority, final DoubleBinaryOperator op) {
         tests.infix(name, priority, op);
-        aliases.put(name, alias);
+        alias(name, alias);
         binaryTests(name, null);
     }
 
@@ -108,9 +133,16 @@ public final class Builder {
         );
     }
 
-    public void fixed(final String name, final String alias, final int arity, final BaseTester.Func f, final int[][] simplifications) {
+    @Override
+    public void fixed(
+            final String name,
+            final String alias,
+            final int arity,
+            final BaseTester.Func f,
+            final int[][] simplifications
+    ) {
         tests.fixed(name, arity, f);
-        aliases.put(name, alias);
+        alias(name, alias);
 
         if (arity == 1) {
             unaryTests(name, simplifications);
@@ -161,13 +193,24 @@ public final class Builder {
         }
     }
 
-    public AbstractTests.TestExpression f(final String name, final int arity, final Supplier<AbstractTests.TestExpression> generator) {
+    private AbstractTests.TestExpression f(
+            final String name,
+            final int arity,
+            final Supplier<AbstractTests.TestExpression> generator
+    ) {
         return f(name, Stream.generate(generator).limit(arity).toArray(AbstractTests.TestExpression[]::new));
     }
 
-    public void any(final String name, final String alias, final int minArity, final int fixedArity, final BaseTester.Func f) {
+    @Override
+    public void any(
+            final String name,
+            final String alias,
+            final int minArity,
+            final int fixedArity,
+            final BaseTester.Func f
+    ) {
         tests.any(name, minArity, 5, f);
-        aliases.put(name, alias);
+        alias(name, alias);
         if (testMulti) {
             tests.any(name, minArity, 5, f);
         } else {
@@ -189,22 +232,18 @@ public final class Builder {
         }
     }
 
-    public AbstractTests getTests() {
+    @Override
+    public void alias(final String name, final String alias) {
+        aliases.put(name, alias);
+    }
+
+    @Override
+    public AbstractTests getLang() {
         return tests;
     }
 
+    @Override
     public Language language(final Dialect parsed, final Dialect unparsed) {
-        return new Language(parsed, unparsed, tests);
-    }
-
-    public Language aliased(final Dialect parsed, final Dialect unparsed) {
-        return language(dialect(parsed, s -> true), unparsed);
-    }
-
-    public Dialect dialect(final Dialect dialect, final Predicate<String> filter) {
-        return dialect.renamed(aliases.entrySet().stream()
-                .filter(e -> filter.test(e.getValue()))
-                .flatMap(e -> Stream.of(e.getKey(), e.getValue()))
-                .toArray(String[]::new));
+        return new Language(parsed.renamed(name -> aliases.getOrDefault(name, name)), unparsed, tests);
     }
 }

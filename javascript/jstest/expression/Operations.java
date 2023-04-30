@@ -11,6 +11,14 @@ import java.util.stream.IntStream;
  */
 public interface Operations {
     Operation ARITH = checker -> {
+        checker.alias("negate", "Negate");
+        checker.alias("+", "Add");
+        checker.alias("-", "Subtract");
+        checker.alias("*", "Multiply");
+        checker.alias("/", "Divide");
+    };
+
+    Operation NARY_ARITH = checker -> {
         checker.unary("negate", "Negate", a -> -a, null);
 
         checker.any("+", "Add", 0, 2, arith(0, Double::sum));
@@ -25,9 +33,9 @@ public interface Operations {
     Operation TWO = constant("two", 2);
 
     // FP
-    Operation MADD = fixed("madd", "*+", 3, args -> args[0] * args[1] + args[2], null);
-    Operation FLOOR = unary("floor", "_", Math::floor, null);
-    Operation CEIL = unary("ceil", "^", Math::ceil, null);
+    Operation MADD = fixed("*+", "Madd", 3, args -> args[0] * args[1] + args[2], null);
+    Operation FLOOR = unary("_", "Floor", Math::floor, null);
+    Operation CEIL = unary("^", "Ceil", Math::ceil, null);
 
     // ArgMinMax
     static Operation argMin(final int arity) {
@@ -89,7 +97,6 @@ public interface Operations {
 
 
     // MeanSQ, RMS
-
     private static double meanSq(final double[] args) {
         return sumsq(args) / args.length;
     }
@@ -97,6 +104,7 @@ public interface Operations {
     private static double rms(final double[] args) {
         return Math.sqrt(meanSq(args));
     }
+
     Operation MEANSQ = any("meansq", "Meansq", 1, 3, Operations::meanSq);
     Operation RMS = any("rms", "RMS", 1, 5, Operations::rms);
 
@@ -164,5 +172,12 @@ public interface Operations {
             new int[][]{{1, 1, 1}, {13, 1, 1}, {21, 26, 1}, {21, 21, 1}, {71, 71, 67}, {59, 22, 22}});
     Operation ATAN2 = binary("atan2", "ArcTan2", Math::atan2,
             new int[][]{{1, 1, 1}, {1, 17, 1}, {16, 1, 1}, {23, 30, 1}, {48, 48, 43}, {50, 46, 41}, {78, 85, 51}, {71, 78, 58}});
+
+    static Operation avg(final int arity) {
+        return fix("avg", "Avg", arity, DoubleStream::average);
+    }
+
+    Operation SUM = any("sum", "Sum", 0, 3, args -> Arrays.stream(args).sum());
+    Operation AVG = avg(-2);
 
 }

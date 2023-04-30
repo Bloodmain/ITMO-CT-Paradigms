@@ -17,10 +17,11 @@ public final class MiniTest {
 
     public static void main(final String... args) {
         final int mode = BaseTester.mode(args, MiniTest.class, "easy", "hard");
-        final TestCounter counter = new TestCounter(ExpressionTest.class, mode, Map.of());
-        ExpressionTest.tester(
+        final TestCounter counter = new TestCounter(MiniTest.class, mode, Map.of());
+        FunctionalTest.tester(
                 counter,
-                new Language(ExpressionTest.ARITHMETIC, ExpressionTest.POLISH,
+                new Language(
+                        FunctionalTest.ARITHMETIC, FunctionalTest.POLISH,
                         new AbstractTests() {{
                             tests(c(10), variable("x", 0));
                         }}

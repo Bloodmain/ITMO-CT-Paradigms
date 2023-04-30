@@ -32,7 +32,8 @@ public final class PostfixTest {
                     "Const op (1 args)", "(0 1)",
                     "Const op (2 args)", "(0 1 2)"
             )
-            .variant("Base")
+            .variant("Base", ARITH)
+            .variant("FloorCeil", FLOOR, CEIL)
             .variant("SumexpLSE", SUMEXP, LSE)
             .variant("MeansqRMS", MEANSQ, RMS)
             .selector();

@@ -4,6 +4,7 @@ import base.Selector;
 import jstest.expression.Builder;
 import jstest.expression.Dialect;
 import jstest.expression.Language;
+import jstest.expression.OperationsBuilder;
 import jstest.object.ObjectTester;
 
 /**
@@ -13,7 +14,7 @@ public final class Kind {
     private Kind() {
     }
 
-    public static Selector.Composite<Builder> selector(
+    public static Selector.Composite<OperationsBuilder> selector(
             final Class<?> owner,
             final String toString,
             final String parse,
@@ -23,8 +24,8 @@ public final class Kind {
         assert parsingTests.length % 2 == 0;
 
         return Builder.selector(owner, mode -> true, (builder, counter) -> {
-            final String insertions = builder.getTests().hasVarargs() ? "abc()+*/@ABC" : "xyz()+*/@ABC";
-            final Language language = builder.aliased(ObjectTester.OBJECT, unparsed);
+            final String insertions = builder.getLang().hasVarargs() ? "abc()+*/@ABC" : "xyz()+*/@ABC";
+            final Language language = builder.language(ObjectTester.OBJECT, unparsed);
             final ParserTester tester = new ParserTester(counter, language, toString, parse, insertions);
             tester.addStage(() -> {
                 for (int i = 0; i < parsingTests.length; i += 2) {
