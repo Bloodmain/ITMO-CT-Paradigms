@@ -180,4 +180,27 @@ public interface Operations {
     Operation SUM = any("sum", "Sum", 0, 3, args -> Arrays.stream(args).sum());
     Operation AVG = avg(-2);
 
+    // Boolean
+    Operation NOT           = unary("!", "Not", a -> not(bool(a)), null);
+    Operation INFIX_AND     = infix("&&",   "And",  90,  bool((a, b) -> a & b));
+    Operation INFIX_OR      = infix("||",   "Or",   80,  bool((a, b) -> a | b));
+    Operation INFIX_XOR     = infix("^^",   "Xor",  70,  bool((a, b) -> a ^ b));
+    Operation INFIX_IMPL    = infix("->",   "Impl", -60, bool((a, b) -> not(a) | b));
+    Operation INFIX_IFF     = infix("<->",  "Iff",  50,  bool((a, b) -> not(a ^ b)));
+
+    private static int not(final int a) {
+        return 1 - a;
+    }
+
+    private static DoubleBinaryOperator bool(final IntBinaryOperator op) {
+        return (a, b) -> op.applyAsInt(bool(a), bool(b)) == 0 ? 0 : 1;
+    }
+
+    private static int bool(final double a) {
+        return a > 0 ? 1 : 0;
+    }
+
+    private static Operation infix(final String name, final String alias, final int priority, final DoubleBinaryOperator op) {
+        return checker -> checker.infix(name, alias, priority, op);
+    }
 }

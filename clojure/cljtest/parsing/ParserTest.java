@@ -1,15 +1,32 @@
 package cljtest.parsing;
 
 import base.Selector;
+import jstest.expression.Operation;
 
-import static jstest.expression.Operations.NARY_ARITH;
+import java.util.function.BiConsumer;
+
+import static jstest.expression.Operations.*;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class ParserTest {
+    private static final Operation VARIABLES = checker -> {
+        final BiConsumer<Character, Integer> var = (first, index) -> {
+            final char prefix = checker.random().nextBoolean() ? first : Character.toUpperCase(first);
+            checker.variable(prefix + checker.random().randomString("xyzXYZ"), index);
+        };
+        for (int i = 0; i < 10; i++) {
+            var.accept('x', 0);
+            var.accept('y', 1);
+            var.accept('z', 2);
+        }
+    };
+
     private static final Selector SELECTOR = ParserTester.builder()
-            .variant("Base", NARY_ARITH)
+            .variant("Base",            NARY_ARITH)
+            .variant("Boolean",         VARIABLES,  INFIX_AND,      INFIX_OR,       INFIX_XOR, NOT)
+            .variant("ImplIff",         VARIABLES,  INFIX_AND,      INFIX_OR,       INFIX_XOR, NOT, INFIX_IMPL, INFIX_IFF)
             .selector();
 
     private ParserTest() {

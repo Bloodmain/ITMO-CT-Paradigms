@@ -115,19 +115,27 @@ public final class ParserTester {
                 pos++;
                 final String value = first + get(ch -> Character.isDigit(ch) || ch == '.');
                 return (sb, priority) -> sb.append(value);
+            } else if (test('~')) {
+                return unary("~");
+            } else if (test('!')) {
+                return unary("!");
             } else {
                 final String identifier = parseIdentifier();
                 if (vars.contains(identifier)) {
                     return (sb, priority) -> sb.append(identifier);
                 } else {
-                    skipSpaces();
-                    expect('(');
-                    final Parsed arg = parse();
-                    skipSpaces();
-                    expect(')');
-                    return (sb, priority) -> arg.convert(sb.append(identifier).append(" "), Integer.MAX_VALUE);
+                    return unary(identifier);
                 }
             }
+        }
+
+        private Parsed unary(final String identifier) {
+            skipSpaces();
+            expect('(');
+            final Parsed arg = parse();
+            skipSpaces();
+            expect(')');
+            return (sb, priority) -> arg.convert(sb.append(identifier).append(" "), Integer.MAX_VALUE);
         }
 
         private static final String SYMBOLS = "*/-+&|^<>=";
