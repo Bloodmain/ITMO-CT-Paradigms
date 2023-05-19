@@ -10,6 +10,8 @@ import static jstest.expression.Operations.*;
 public final class ObjectTest {
     public static final Selector SELECTOR = ObjectTester.builder()
             .variant("Base", NARY_ARITH)
+            .variant("SinCos",          SIN,         COS)
+            .variant("SinhCosh",        SINH,        COSH)
             .variant("MeansqRMS",       MEANSQ,      RMS)
             .variant("SumexpLSE",       SUMEXP,      LSE)
             .selector();

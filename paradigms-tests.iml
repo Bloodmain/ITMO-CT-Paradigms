@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/javascript" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/clojure" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/prolog" isTestSource="false" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -15,5 +16,6 @@
     <orderEntry type="module" module-name="paradigms-solutions" />
     <orderEntry type="library" name="clojure" level="project" />
     <orderEntry type="library" name="clojure (2)" level="project" />
+    <orderEntry type="library" name="prolog" level="project" />
   </component>
 </module>

@@ -173,6 +173,16 @@ public interface Operations {
     Operation ATAN2 = binary("atan2", "ArcTan2", Math::atan2,
             new int[][]{{1, 1, 1}, {1, 17, 1}, {16, 1, 1}, {23, 30, 1}, {48, 48, 43}, {50, 46, 41}, {78, 85, 51}, {71, 78, 58}});
 
+
+    // Inc, dec
+    Operation INC = unary("++", "Inc", a -> a + 1, null);
+    Operation DEC = unary("--", "Dec", a -> a - 1, null);
+
+    // Unary pow, log
+    Operation UNARY_POW = unary("**", "UPow", Math::exp, null);
+    Operation UNARY_LOG = unary("//", "ULog", Math::log, null);
+
+
     static Operation avg(final int arity) {
         return fix("avg", "Avg", arity, DoubleStream::average);
     }

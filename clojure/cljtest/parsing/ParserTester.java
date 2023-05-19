@@ -1,13 +1,11 @@
 package cljtest.parsing;
 
-import base.ExtendedRandom;
 import base.Selector;
+import cljtest.functional.FunctionalTester;
 import cljtest.object.ObjectTester;
 import jstest.expression.*;
 
-import java.util.Set;
-import java.util.function.BiFunction;
-import java.util.function.IntPredicate;
+import java.util.List;
 import java.util.function.ToIntFunction;
 
 /**
@@ -29,23 +27,18 @@ public final class ParserTester {
                             false,
                             mode.parse,
                             mode.toString,
-                            spoiler(mode, builder.getLang())
+                            mode == Mode.INFIX ? List.of(spoiler(builder.getVariant())) : List.of()
                     );
                 },
                 "easy", "hard"
         );
     }
 
-    private static BiFunction<ExtendedRandom, String, String> spoiler(final Mode mode, final Lang language) {
-        return (random, expression) -> {
-            if (random.nextBoolean()) {
-                return expression;
-            }
-            if (mode == Mode.INFIX) {
-                final Parsed parsed = new Parser(expression, language.getVariableNames().keySet(), language::getPriority).parse();
-                expression = parsed.convert(new StringBuilder(), 0).toString();
-            }
-            return ObjectTester.addSpaces(expression, random);
+    private static FunctionalTester.Spoiler spoiler(final Variant variant) {
+        final Expr.Cata<Parsed> cata = createCata(variant::getPriority);
+        return (expression, expr, random) -> {
+            expression = expr.cata(cata).convert(0);
+            return random.nextBoolean() ? ObjectTester.addSpaces(expression, random) : expression;
         };
     }
 
@@ -56,7 +49,7 @@ public final class ParserTester {
                 "%s.0",
                 (op, args) -> {
                     switch (args.size()) {
-                        case 1: return op + "(" + args.get(0) + ")";
+                        case 1: return op + " " + args.get(0);
                         case 2: return "(" + args.get(0) + " " + op + " " + args.get(1) + ")";
                         default: throw new AssertionError("Unsupported op " + op + "/" + args.size());
                     }
@@ -74,109 +67,32 @@ public final class ParserTester {
         }
     }
 
-    private interface Parsed {
-        StringBuilder convert(StringBuilder sb, int priority);
+    private static Expr.Cata<Parsed> createCata(final ToIntFunction<String> priorities) {
+        return Expr.cata(
+                name -> priority -> name,
+                value -> priority -> String.format("%d.0", value),
+                name -> priority -> name,
+                (name, args) -> priority -> {
+                    switch (args.size()) {
+                        case 1:
+                            return name + " " + args.get(0).convert(Integer.MAX_VALUE);
+                        case 2:
+                            final int p = priorities.applyAsInt(name);
+                            final int local = Math.abs(p);
+                            final boolean parens = local < priority;
+                            return (parens ? "(" : "") +
+                                    args.get(0).convert(local + (p > 0 ? 0 : 1)) +
+                                    name +
+                                    args.get(1).convert(local + (p > 0 ? 1 : 0)) +
+                                    (parens ? ")" : "");
+                        default:
+                            throw new AssertionError("Unsupported arity " + name + "/" + args.size());
+                    }
+                }
+        );
     }
 
-    private static class Parser {
-        private final String expression;
-        private final Set<String> vars;
-        private final ToIntFunction<String> priorities;
-        int pos = 0;
-
-        public Parser(final String expression, final Set<String> vars, final ToIntFunction<String> priorities) {
-            this.expression = expression + "$";
-            this.vars = vars;
-            this.priorities = priorities;
-        }
-
-        public Parsed parse() {
-            skipSpaces();
-            if (test('(')) {
-                final Parsed left = parse();
-                skipSpaces();
-                final String op = parseIdentifier();
-                final Parsed right = parse();
-                skipSpaces();
-                expect(')');
-                return (sb, priority) -> {
-                    final int p = priorities.applyAsInt(op);
-                    final int local = Math.abs(p);
-                    final int l = local + (p > 0 ? 0 : 1);
-                    final int r = local + (p > 0 ? 1 : 0);
-                    if (local < priority) {
-                        return right.convert(left.convert(sb.append("("), l).append(op), r).append(")");
-                    } else {
-                        return right.convert(left.convert(sb, l).append(op), r);
-                    }
-                };
-            } else if (Character.isDigit(getChar()) || getChar() == '-') {
-                final char first = getChar();
-                pos++;
-                final String value = first + get(ch -> Character.isDigit(ch) || ch == '.');
-                return (sb, priority) -> sb.append(value);
-            } else if (test('~')) {
-                return unary("~");
-            } else if (test('!')) {
-                return unary("!");
-            } else {
-                final String identifier = parseIdentifier();
-                if (vars.contains(identifier)) {
-                    return (sb, priority) -> sb.append(identifier);
-                } else {
-                    return unary(identifier);
-                }
-            }
-        }
-
-        private Parsed unary(final String identifier) {
-            skipSpaces();
-            expect('(');
-            final Parsed arg = parse();
-            skipSpaces();
-            expect(')');
-            return (sb, priority) -> arg.convert(sb.append(identifier).append(" "), Integer.MAX_VALUE);
-        }
-
-        private static final String SYMBOLS = "*/-+&|^<>=";
-
-        private String parseIdentifier() {
-            final char first = getChar();
-            if (Character.isLetter(first)) {
-                return get(Character::isLetterOrDigit);
-            } else {
-                return get(ch -> SYMBOLS.indexOf(ch) >= 0);
-            }
-        }
-
-        private void expect(final char ch) {
-            if (!test(ch)) {
-                throw new AssertionError(String.format("%d: expected '%c', found '%c'", pos + 1, ch, getChar()));
-            }
-        }
-
-        private char getChar() {
-            return expression.charAt(pos);
-        }
-
-        private boolean test(final char ch) {
-            if (getChar() == ch) {
-                pos++;
-                return true;
-            }
-            return false;
-        }
-
-        private void skipSpaces() {
-            get(Character::isWhitespace);
-        }
-
-        private String get(final IntPredicate p) {
-            final int start = pos;
-            while (p.test(getChar())) {
-                pos++;
-            }
-            return expression.substring(start, pos);
-        }
+    private interface Parsed {
+        String convert(int priority);
     }
 }

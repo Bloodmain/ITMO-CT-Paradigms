@@ -1,8 +1,9 @@
 package jstest.expression;
 
-import jstest.expression.BaseTester.Expr;
+import jstest.expression.BaseTester.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
@@ -10,30 +11,34 @@ import java.util.List;
 public class Language {
     private final Dialect parsed;
     private final Dialect unparsed;
-    private final AbstractTests template;
-    private final List<Expr> tests;
+    private final BaseVariant variant;
+    private final List<Test> tests;
 
-    public Language(final Dialect parsed, final Dialect unparsed, final AbstractTests template) {
+    public Language(final Dialect parsed, final Dialect unparsed, final BaseVariant variant) {
         this.parsed = parsed;
         this.unparsed = unparsed;
 
-        this.template = template;
-        tests = template.renderTests(parsed, unparsed);
+        this.variant = variant;
+        tests = variant.getTests().stream().map(this::test).collect(Collectors.toUnmodifiableList());
     }
 
-    public Expr randomTest(final int size) {
-        return template.randomTest(size, parsed, unparsed);
+    private Test test(final Expr expr) {
+        return new Test(expr, parsed.render(expr), unparsed.render(expr));
+    }
+
+    public Test randomTest(final int size) {
+        return test(variant.randomTest(size));
     }
 
     public List<int[]> getSimplifications() {
-        return template.getSimplifications();
+        return variant.getSimplifications();
     }
 
-    public List<AbstractTests.TestExpression> getVariables() {
-        return template.getVariables();
+    public List<Expr> getVariables() {
+        return variant.getVariables();
     }
 
-    public List<Expr> getTests() {
+    public List<Test> getTests() {
         return tests;
     }
 }

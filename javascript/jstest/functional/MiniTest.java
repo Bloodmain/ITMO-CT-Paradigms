@@ -1,7 +1,7 @@
 package jstest.functional;
 
 import base.TestCounter;
-import jstest.expression.AbstractTests;
+import jstest.expression.BaseVariant;
 import jstest.expression.BaseTester;
 import jstest.expression.Language;
 
@@ -22,7 +22,7 @@ public final class MiniTest {
                 counter,
                 new Language(
                         FunctionalTest.ARITHMETIC, FunctionalTest.POLISH,
-                        new AbstractTests() {{
+                        new BaseVariant() {{
                             tests(c(10), variable("x", 0));
                         }}
                 ), mode == 1, Path.of("functionalMiniExpression.js")

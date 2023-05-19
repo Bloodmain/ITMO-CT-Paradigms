@@ -24,7 +24,7 @@ public final class Kind {
         assert parsingTests.length % 2 == 0;
 
         return Builder.selector(owner, mode -> true, (builder, counter) -> {
-            final String insertions = builder.getLang().hasVarargs() ? "abc()+*/@ABC" : "xyz()+*/@ABC";
+            final String insertions = builder.getVariant().hasVarargs() ? "abc()+*/@ABC" : "xyz()+*/@ABC";
             final Language language = builder.language(ObjectTester.OBJECT, unparsed);
             final ParserTester tester = new ParserTester(counter, language, toString, parse, insertions);
             tester.addStage(() -> {

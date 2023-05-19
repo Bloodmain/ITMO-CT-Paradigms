@@ -4,7 +4,7 @@ import base.ExtendedRandom;
 import base.Selector;
 import base.TestCounter;
 import base.Tester;
-import jstest.ArithmeticTests;
+import jstest.ArithmeticVariant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,20 +12,20 @@ import java.util.function.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static jstest.expression.AbstractTests.c;
+import static jstest.expression.BaseVariant.c;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class Builder implements OperationsBuilder, LanguageBuilder {
-    private final ArithmeticTests tests = new ArithmeticTests();
+    private final ArithmeticVariant variant = new ArithmeticVariant();
     private final boolean testMulti;
     private final Map<String, String> aliases = new HashMap<>();
 
-    private final AbstractTests.TestExpression vx = tests.vx, vy = tests.vy, vz = tests.vz;
-    private final Supplier<AbstractTests.TestExpression> constGenerator = () -> c(tests.random().nextInt(10));
-    private final Supplier<AbstractTests.TestExpression> variableGenerator = () -> tests.random().randomItem(tests.getVariables());
-    private final Supplier<AbstractTests.TestExpression> generator = () -> tests.random().nextBoolean()
+    private final Expr vx = variant.vx, vy = variant.vy, vz = variant.vz;
+    private final Supplier<Expr> constGenerator = () -> c(variant.random().nextInt(10));
+    private final Supplier<Expr> variableGenerator = () -> variant.random().randomItem(variant.getVariables());
+    private final Supplier<Expr> generator = () -> variant.random().nextBoolean()
             ? variableGenerator.get()
             : constGenerator.get();
 
@@ -47,19 +47,19 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
         );
     }
 
-    private AbstractTests.TestExpression f(final String name, final AbstractTests.TestExpression... args) {
-        return tests.f(name, args);
+    private Expr f(final String name, final Expr... args) {
+        return variant.f(name, args);
     }
 
-    private void tests(final int[][] simplifications, final AbstractTests.TestExpression... tests) {
-        this.tests.tests(simplifications, tests);
+    private void tests(final int[][] simplifications, final Expr... tests) {
+        variant.tests(simplifications, tests);
     }
 
     @Override
     public void constant(final String name, final double value) {
         final BaseTester.Func expr = vars -> value;
-        tests.nullary(name, expr);
-        final AbstractTests.TestExpression constant = (parsed, unparsed) -> new BaseTester.Expr(name, name, expr);
+        variant.nullary(name, expr);
+        final Expr constant = Expr.nullary(name, expr);
         tests(null,
                 f("+", constant, vx),
                 f("-", vy, constant),
@@ -70,12 +70,12 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
 
     @Override
     public void variable(final String name, final int index) {
-        tests.variable(name, index);
+        variant.variable(name, index);
     }
 
     @Override
     public ExtendedRandom random() {
-        return getLang().random();
+        return getVariant().random();
     }
 
     @Override
@@ -85,7 +85,7 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
             final DoubleUnaryOperator op,
             final int[][] simplifications
     ) {
-        tests.unary(name, op);
+        variant.unary(name, op);
         alias(name, alias);
         unaryTests(name, simplifications);
     }
@@ -108,14 +108,14 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
             final DoubleBinaryOperator op,
             final int[][] simplifications
     ) {
-        tests.binary(name, op);
+        variant.binary(name, op);
         alias(name, alias);
         binaryTests(name, simplifications);
     }
 
     @Override
     public void infix(final String name, final String alias, final int priority, final DoubleBinaryOperator op) {
-        tests.infix(name, priority, op);
+        variant.infix(name, priority, op);
         alias(name, alias);
         binaryTests(name, null);
     }
@@ -141,7 +141,7 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
             final BaseTester.Func f,
             final int[][] simplifications
     ) {
-        tests.fixed(name, arity, f);
+        variant.fixed(name, arity, f);
         alias(name, alias);
 
         if (arity == 1) {
@@ -149,9 +149,9 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
         } else if (arity == 2) {
             binaryTests(name, simplifications);
         } else if (arity == 3) {
-            final AbstractTests.TestExpression e1 = f(name, vx, vy, c(0));
-            final AbstractTests.TestExpression e2 = f(name, vx, vy, c(1));
-            final AbstractTests.TestExpression e3 = f(name, f("+", vx, vy), f("-", vy, vz), f("*", vz, vx));
+            final Expr e1 = f(name, vx, vy, c(0));
+            final Expr e2 = f(name, vx, vy, c(1));
+            final Expr e3 = f(name, f("+", vx, vy), f("-", vy, vz), f("*", vz, vx));
             tests(
                     simplifications,
                     f(name, c(1), c(2), c(3)),
@@ -163,10 +163,10 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
                     f(name, e1, e2, e3)
             );
         } else if (arity == 4) {
-            final AbstractTests.TestExpression e1 = f(name, vx, vy, vz, c(0));
-            final AbstractTests.TestExpression e2 = f(name, vx, vy, vz, c(1));
-            final AbstractTests.TestExpression e3 = f(name, c(1), c(2), c(3), vx);
-            final AbstractTests.TestExpression e4 = f(name, f("+", vx, vy), f("-", vy, vz), f("*", vz, vx), f("/", vx, c(3)));
+            final Expr e1 = f(name, vx, vy, vz, c(0));
+            final Expr e2 = f(name, vx, vy, vz, c(1));
+            final Expr e3 = f(name, c(1), c(2), c(3), vx);
+            final Expr e4 = f(name, f("+", vx, vy), f("-", vy, vz), f("*", vz, vx), f("/", vx, c(3)));
             tests(
                     simplifications,
                     f(name, c(1), c(2), c(3), c(4)),
@@ -188,17 +188,17 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
                                     ),
                                     IntStream.range(0, 10).mapToObj(i -> f(name, arity, generator))
                             )
-                            .toArray(AbstractTests.TestExpression[]::new)
+                            .toArray(Expr[]::new)
             );
         }
     }
 
-    private AbstractTests.TestExpression f(
+    private Expr f(
             final String name,
             final int arity,
-            final Supplier<AbstractTests.TestExpression> generator
+            final Supplier<Expr> generator
     ) {
-        return f(name, Stream.generate(generator).limit(arity).toArray(AbstractTests.TestExpression[]::new));
+        return f(name, Stream.generate(generator).limit(arity).toArray(Expr[]::new));
     }
 
     @Override
@@ -209,16 +209,16 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
             final int fixedArity,
             final BaseTester.Func f
     ) {
-        tests.any(name, minArity, 5, f);
+        variant.any(name, minArity, 5, f);
         alias(name, alias);
         if (testMulti) {
-            tests.any(name, minArity, 5, f);
+            variant.any(name, minArity, 5, f);
         } else {
-            tests.fixed(name, fixedArity, f);
+            variant.fixed(name, fixedArity, f);
         }
 
         if (testMulti) {
-            tests.tests(
+            variant.tests(
                     f(name, vx),
                     f(name, vx, vy, vz),
                     f(name, vx, vy, vz, c(3), c(5)),
@@ -228,7 +228,7 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
         }
 
         for (int i = 1; i < 10; i++) {
-            tests.tests(f(name, testMulti ? i : fixedArity, generator));
+            variant.tests(f(name, testMulti ? i : fixedArity, generator));
         }
     }
 
@@ -238,12 +238,12 @@ public final class Builder implements OperationsBuilder, LanguageBuilder {
     }
 
     @Override
-    public AbstractTests getLang() {
-        return tests;
+    public Variant getVariant() {
+        return variant;
     }
 
     @Override
     public Language language(final Dialect parsed, final Dialect unparsed) {
-        return new Language(parsed.renamed(name -> aliases.getOrDefault(name, name)), unparsed, tests);
+        return new Language(parsed.renamed(name -> aliases.getOrDefault(name, name)), unparsed, variant);
     }
 }

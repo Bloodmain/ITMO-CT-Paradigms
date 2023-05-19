@@ -99,7 +99,7 @@
   (toStringInfix [this]
     (if (= (count args) 2)
       (str "(" (.toStringInfix (first args)) " " symb " " (.toStringInfix (last args)) ")")
-      (str symb "(" (.toStringInfix (first args)) ")")))
+      (str symb " " (.toStringInfix (first args)))))
   (diff [this by]
     (apply Add
            (map-indexed #(Multiply (.diff %2 by) (apply partDiff %1 %2 (rem-nth %1 args))) args))))

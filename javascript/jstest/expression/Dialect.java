@@ -13,6 +13,8 @@ public class Dialect {
     private final BiFunction<String, List<String>, String> nary;
     private final Function<String, String> renamer;
 
+    private final Expr.Cata<String> cata;
+
     private Dialect(
             final String variable,
             final String constant,
@@ -23,6 +25,13 @@ public class Dialect {
         this.constant = constant;
         this.nary = nary;
         this.renamer = renamer;
+
+        cata = Expr.cata(
+                name -> String.format(this.variable, name),
+                value -> String.format(this.constant, value),
+                name -> name,
+                (name, args) -> this.nary.apply(this.renamer.apply(name), args)
+        );
     }
 
     public Dialect(final String variable, final String constant, final BiFunction<String, List<String>, String> nary) {
@@ -41,20 +50,12 @@ public class Dialect {
         return new Dialect(variable, constant, nary, this.renamer.compose(renamer));
     }
 
-    public String variable(final String name) {
-        return String.format(variable, name);
+    public String render(final Expr expr) {
+        return expr.cata(cata);
     }
 
-    public String constant(final int value) {
-        return String.format(constant, value);
-    }
-
-    public static String nullary(final String name) {
-        return name;
-    }
-
-    public String operation(final String name, final List<String> as) {
-        return nary.apply(renamer.apply(name), as);
+    public String meta(final String name, final String... args) {
+        return nary.apply(name, List.of(args));
     }
 
     public Dialect functional() {

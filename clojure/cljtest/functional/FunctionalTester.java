@@ -1,14 +1,14 @@
 package cljtest.functional;
 
-import base.ExtendedRandom;
 import base.Selector;
 import base.TestCounter;
 import cljtest.ClojureEngine;
-import jstest.Engine;
 import jstest.expression.*;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
@@ -26,13 +26,11 @@ public class FunctionalTester extends BaseTester<Object, ClojureEngine> {
                         counter,
                         builder.language(PARSED, UNPARSED),
                         Optional.empty(),
-                        "parseFunction", "", (a, b) -> b
+                        "parseFunction", "", List.of()
                 ),
                 "easy", "hard"
         );
     }
-
-    private final BiFunction<ExtendedRandom, String, String> spoiler;
 
     protected FunctionalTester(
             final TestCounter counter,
@@ -40,14 +38,13 @@ public class FunctionalTester extends BaseTester<Object, ClojureEngine> {
             final Optional<String> evaluate,
             final String parse,
             final String toString,
-            final BiFunction<ExtendedRandom, String, String> spoiler
+            final List<Spoiler> spoilers
     ) {
-        super(counter, new ClojureEngine("expression.clj", evaluate, parse, toString), language, true);
-        this.spoiler = spoiler;
-    }
-
-    @Override
-    public Engine.Result<Object> parse(final String expression) {
-        return super.parse(spoiler.apply(random(), expression));
+        super(
+                counter,
+                new ClojureEngine("expression.clj", evaluate, parse, toString),
+                language,
+                Stream.concat(STANDARD_SPOILERS.stream(), spoilers.stream()).collect(Collectors.toUnmodifiableList())
+        );
     }
 }

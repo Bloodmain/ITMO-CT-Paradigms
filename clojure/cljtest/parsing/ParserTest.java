@@ -25,6 +25,8 @@ public final class ParserTest {
 
     private static final Selector SELECTOR = ParserTester.builder()
             .variant("Base",            NARY_ARITH)
+            .variant("IncDec",          VARIABLES,  INC,            DEC)
+            .variant("UPowLog",         VARIABLES,  UNARY_POW,      UNARY_LOG)
             .variant("Boolean",         VARIABLES,  INFIX_AND,      INFIX_OR,       INFIX_XOR, NOT)
             .variant("ImplIff",         VARIABLES,  INFIX_AND,      INFIX_OR,       INFIX_XOR, NOT, INFIX_IMPL, INFIX_IFF)
             .selector();

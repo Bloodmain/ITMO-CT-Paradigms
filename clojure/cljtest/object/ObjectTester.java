@@ -1,14 +1,13 @@
 package cljtest.object;
 
-import base.ExtendedRandom;
 import base.Selector;
 import base.TestCounter;
 import cljtest.functional.FunctionalTester;
 import jstest.Engine;
 import jstest.expression.*;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.function.BiFunction;
 
 /**
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
@@ -27,7 +26,7 @@ public class ObjectTester extends FunctionalTester {
                             counter,
                             language,
                             counter.mode() >= 1,
-                            "parseObject", "toString", (a, b) -> b
+                            "parseObject", "toString", List.of()
                     );
                 },
                 "easy", "hard"
@@ -38,10 +37,11 @@ public class ObjectTester extends FunctionalTester {
             final TestCounter counter,
             final Language language,
             final boolean testDiff,
-            final String parse, final String toString,
-            final BiFunction<ExtendedRandom, String, String> spoiler
+            final String parse,
+            final String toString,
+            final List<Spoiler> spoilers
     ) {
-        super(counter, language, Optional.of("evaluate"), parse, toString, spoiler);
+        super(counter, language, Optional.of("evaluate"), parse, toString, spoilers);
         if (testDiff) {
             DIFF.diff(this);
         }

@@ -24,108 +24,12 @@ class Operation {
     postfix() {
         return "(" + this.operandsToString("postfix") + " " + this.symbol + ")";
     }
-}
-
-class ComposedOperation extends Operation {
-    composedFrom;
-
-    evaluate(x, y, z) {
-        return this.composedFrom.evaluate(x, y, z);
-    }
 
     diff(by) {
-        return this.composedFrom.diff(by);
+        return new Add(...this.operands.map((el, i) => new Multiply(el.diff(by), this.partDiff(i))));
     }
 }
 
-class Add extends Operation {
-    constructor(...terms) {
-        super();
-        this.operands = terms;
-        this.symbol = '+';
-    }
-
-    evaluatingRule(...terms) {
-        return terms.reduce((a, b) => a + b, 0);
-    }
-
-    diff(by) {
-        return new Add(...this.operands.map(a => a.diff(by)))
-    }
-}
-
-class Subtract extends Operation {
-    constructor(minuend, subtracted) {
-        super();
-        this.operands = [minuend, subtracted];
-        this.symbol = '-';
-    }
-
-    evaluatingRule(minuend, subtracted) {
-        return minuend - subtracted;
-    }
-
-    diff(by) {
-        return new Subtract(this.operands[0].diff(by), this.operands[1].diff(by));
-    }
-}
-
-class Multiply extends Operation {
-    constructor(mul1, mul2) {
-        super();
-        this.operands = [mul1, mul2];
-        this.symbol = '*';
-    }
-
-    evaluatingRule(mul1, mul2) {
-        return mul1 * mul2;
-    }
-
-    diff(by) {
-        return new Add(
-            new Multiply(this.operands[0].diff(by), this.operands[1]),
-            new Multiply(this.operands[0], this.operands[1].diff(by))
-        );
-    }
-}
-
-class Divide extends Operation {
-    constructor(dividend, divider) {
-        super();
-        this.operands = [dividend, divider];
-        this.symbol = '/';
-    }
-
-    evaluatingRule(dividend, divider) {
-        return dividend / divider;
-    }
-
-    diff(by) {
-        return new Divide(
-            new Subtract(
-                new Multiply(this.operands[0].diff(by), this.operands[1]),
-                new Multiply(this.operands[0], this.operands[1].diff(by))
-            ),
-            new Multiply(this.operands[1], this.operands[1])
-        );
-    }
-}
-
-class Negate extends Operation {
-    constructor(operand) {
-        super();
-        this.operands = [operand];
-        this.symbol = 'negate';
-    }
-
-    evaluatingRule(operand) {
-        return -operand;
-    }
-
-    diff(by) {
-        return new Negate(this.operands[0].diff(by));
-    }
-}
 
 class Const {
     constructor(val) {
@@ -173,12 +77,105 @@ class Variable {
     postfix = this.toString;
 }
 
-class SumrecN extends ComposedOperation {
+let ZERO = new Const(0);
+let ONE = new Const(1);
+let NEG_ONE = new Const(-1);
+let rem_nth = (arr, i) => arr.filter((x, j) => j !== i);
+
+class Add extends Operation {
+    constructor(...terms) {
+        super();
+        this.operands = terms;
+        this.symbol = '+';
+    }
+
+    evaluatingRule(...terms) {
+        return terms.reduce((a, b) => a + b, 0);
+    }
+
+    partDiff(i) {
+        return ONE;
+    }
+}
+
+class Subtract extends Operation {
+    constructor(minuend, subtracted) {
+        super();
+        this.operands = [minuend, subtracted];
+        this.symbol = '-';
+    }
+
+    evaluatingRule(minuend, subtracted) {
+        return minuend - subtracted;
+    }
+
+    partDiff(i) {
+        return i === 0 ? ONE : NEG_ONE;
+    }
+}
+
+class Multiply extends Operation {
+    constructor(mul1, mul2) {
+        super();
+        this.operands = [mul1, mul2];
+        this.symbol = '*';
+    }
+
+    evaluatingRule(mul1, mul2) {
+        return mul1 * mul2;
+    }
+
+    partDiff(i) {
+        return this.operands[1 - i];
+    }
+}
+
+class Divide extends Operation {
+    constructor(dividend, divider) {
+        super();
+        this.operands = [dividend, divider];
+        this.symbol = '/';
+    }
+
+    evaluatingRule(dividend, divider) {
+        return dividend / divider;
+    }
+
+    partDiff(i) {
+        return i === 0 ? new Divide(ONE, this.operands[1]) :
+            new Negate(new Divide(this.operands[0], new Multiply(this.operands[1], this.operands[1])));
+    }
+}
+
+class Negate extends Operation {
+    constructor(operand) {
+        super();
+        this.operands = [operand];
+        this.symbol = 'negate';
+    }
+
+    evaluatingRule(operand) {
+        return -operand;
+    }
+
+    partDiff(i) {
+        return NEG_ONE;
+    }
+}
+
+class SumrecN extends Operation {
     constructor(...operands) {
         super();
         this.operands = operands;
         this.symbol = 'sumrec' + operands.length;
-        this.composedFrom = new Add(...operands.map(a => new Divide(new Const(1), a)));
+    }
+
+    evaluatingRule(...operands) {
+        return operands.reduce((x, y) => x + 1 / y, 0);
+    }
+
+    partDiff(i) {
+        return new Negate(new Divide(ONE, new Multiply(this.operands[i], this.operands[i])))
     }
 }
 
@@ -206,12 +203,22 @@ class Sumrec5 extends SumrecN {
     }
 }
 
-class HMeanN extends ComposedOperation {
+class HMeanN extends Operation {
     constructor(...operands) {
         super();
         this.operands = operands;
         this.symbol = 'hmean' + operands.length;
-        this.composedFrom = new Divide(new Const(operands.length), new SumrecN(...operands));
+    }
+
+    evaluatingRule(...operands) {
+        return operands.length / operands.reduce((x, y) => x + 1 / y, 0);
+    }
+
+    partDiff(i) {
+        return new Divide(new Const(this.operands.length),
+            new Multiply(
+                new Multiply(this.operands[i], this.operands[i]),
+                new Multiply(new SumrecN(...this.operands), new SumrecN(...this.operands))));
     }
 }
 
@@ -239,52 +246,36 @@ class HMean5 extends HMeanN {
     }
 }
 
-class Square extends ComposedOperation {
-    constructor(operand) {
-        super();
-        this.operands = [operand];
-        this.symbol = 'square';
-        this.composedFrom = new Multiply(operand, operand);
-    }
-}
-
-class SquareRoot extends Operation {
-    constructor(operand) {
-        super();
-        this.operands = [operand];
-        this.symbol = 'sqrt';
-    }
-
-    evaluatingRule(operand) {
-        return Math.sqrt(operand);
-    }
-
-    diff(by) {
-        return new Divide(
-            this.operands[0].diff(by),
-            new Multiply(new Const(2), this)
-        );
-    }
-}
-
-class Meansq extends ComposedOperation {
+class Meansq extends Operation {
     constructor(...operands) {
         super();
         this.operands = operands;
         this.symbol = 'meansq';
-        this.composedFrom = new Divide(
-            new Add(...operands.map(el => new Square(el))),
-            new Const(this.operands.length)
-        );
+    }
+
+    evaluatingRule(...operands) {
+        return operands.reduce((x, y) => x + y * y, 0) / operands.length;
+    }
+
+    partDiff(i) {
+        return new Divide(new Multiply(new Const(2), this.operands[i]),
+            new Const(this.operands.length));
     }
 }
 
-class RMS extends ComposedOperation {
+class RMS extends Operation {
     constructor(...operands) {
         super();
         this.operands = operands;
         this.symbol = 'rms';
-        this.composedFrom = new SquareRoot(new Meansq(...operands));
+    }
+
+    evaluatingRule(...operands) {
+        return Math.sqrt(operands.reduce((x, y) => x + y * y, 0) / operands.length);
+    }
+
+    partDiff(i) {
+        return new Divide(this.operands[i], new Multiply(new Const(this.operands.length), new RMS(...this.operands)));
     }
 }
 

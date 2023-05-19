@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
 
 /**
@@ -25,19 +26,25 @@ public abstract class BaseTester<X, E extends Engine<X>> extends Tester {
     /*package*/ final Language language;
     private final List<Runnable> stages = new ArrayList<>();
 
-    final boolean testParsing;
+    private final List<Spoiler> spoilers;
+
+    public static final List<Spoiler> STANDARD_SPOILERS = List.of(
+            (unparsed, expr, random) -> unparsed,
+            (unparsed, expr, random) -> addSpaces(unparsed, random)
+    );
 
     protected BaseTester(
             final TestCounter counter,
             final E engine,
             final Language language,
-            final boolean testParsing
+            final List<Spoiler> spoilers
     ) {
         super(counter);
         this.engine = engine;
         this.language = language;
-        this.testParsing = testParsing;
+        this.spoilers = spoilers;
     }
+
 
     private static boolean safe(final char ch) {
         return !Character.isLetterOrDigit(ch) && "+-*/.<>=&|^".indexOf(ch) == -1;
@@ -59,15 +66,20 @@ public abstract class BaseTester<X, E extends Engine<X>> extends Tester {
 
     @Override
     public void test() {
-        for (final Expr test : language.getTests()) {
+        for (final Test test : language.getTests()) {
             try {
-                test(engine.prepare(test.parsed), test.answer, test.unparsed);
-                if (testParsing) {
-                    test(parse(test.unparsed), test.answer, test.unparsed);
-                    test(parse(addSpaces(test.unparsed, random())), test.answer, test.unparsed);
-                }
+                test(test, prepared -> counter.scope("Testing: " + prepared, () -> {
+                    for (double i = 0; i <= N; i++) {
+                        for (double j = 0; j <= N; j++) {
+                            for (double k = 0; k <= N; k++) {
+                                final double[] vars = new double[]{i, j, k};
+                                evaluate(prepared, vars, test.evaluate(vars));
+                            }
+                        }
+                    }
+                }));
             } catch (final RuntimeException | AssertionError e) {
-                throw new AssertionError("Error while testing " + test.parsed + ": " + e.getMessage(), e);
+                throw new AssertionError("Error while testing " + test.getParsed() + ": " + e.getMessage(), e);
             }
         }
 
@@ -75,23 +87,17 @@ public abstract class BaseTester<X, E extends Engine<X>> extends Tester {
         stages.forEach(Runnable::run);
     }
 
-    public Engine.Result<X> parse(final String expression) {
-        return engine.parse(expression);
+    private void test(final Test test, final Consumer<Engine.Result<X>> check) {
+        final Consumer<Engine.Result<X>> fullCheck = prepared -> counter.test(() -> {
+            check.accept(prepared);
+            test(prepared, test.getUnparsed());
+        });
+        fullCheck.accept(engine.prepare(test.getParsed()));
+        spoilers.forEach(spoiler -> fullCheck.accept(parse(spoiler.spoil(test.getUnparsed(), test.expr, random()))));
     }
 
-    protected void test(final Engine.Result<X> prepared, final Func f, final String unparsed) {
-        counter.scope("Testing: " + prepared, () -> {
-            for (double i = 0; i <= N; i++) {
-                for (double j = 0; j <= N; j++) {
-                    for (double k = 0; k <= N; k++) {
-                        final double[] vars = new double[]{i, j, k};
-                        evaluate(prepared, vars, f.applyAsDouble(vars));
-                    }
-                }
-            }
-
-            test(prepared, unparsed);
-        });
+    protected final Engine.Result<X> parse(final String expression) {
+        return engine.parse(expression);
     }
 
     protected void test(final Engine.Result<X> prepared, final String unparsed) {
@@ -104,23 +110,11 @@ public abstract class BaseTester<X, E extends Engine<X>> extends Tester {
             }
             final double[] vars = random().getRandom().doubles().limit(language.getVariables().size()).toArray();
 
-            final Expr test = language.randomTest(i);
-            final double answer = test.answer.applyAsDouble(vars);
+            final Test test = language.randomTest(i);
+            final double answer = test.evaluate(vars);
 
-            final Engine.Result<X> prepared = engine.prepare(test.parsed);
-            test(prepared, vars, test, answer);
-            if (testParsing) {
-                counter.test(() -> {
-                    test(parse(test.unparsed), vars, test, answer);
-                    test(parse(addSpaces(test.unparsed, random())), vars, test, answer);
-                });
-            }
+            test(test, prepared -> evaluate(prepared, vars, answer));
         }
-    }
-
-    public void test(final Engine.Result<X> prepared, final double[] vars, final Expr test, final double answer) {
-        evaluate(prepared, vars, answer);
-        test(prepared, test.unparsed);
     }
 
     public void evaluate(final Engine.Result<X> prepared, final double[] vars, final double expected) {
@@ -154,15 +148,31 @@ public abstract class BaseTester<X, E extends Engine<X>> extends Tester {
         double applyAsDouble(double... args);
     }
 
-    public static class Expr {
-        public final String parsed;
-        public final String unparsed;
-        public final Func answer;
+    public static class Test {
+        public final Expr expr;
+        private final String parsed;
+        private final String unparsed;
 
-        public Expr(final String parsed, final String unparsed, final Func answer) {
+        public Test(final Expr expr, final String parsed, final String unparsed) {
+            this.expr = Objects.requireNonNull(expr);
             this.parsed = Objects.requireNonNull(parsed);
             this.unparsed = Objects.requireNonNull(unparsed);
-            this.answer = answer;
         }
+
+        public String getParsed() {
+            return parsed;
+        }
+
+        public String getUnparsed() {
+            return unparsed;
+        }
+
+        public double evaluate(final double... vars) {
+            return expr.evaluate(vars);
+        }
+    }
+
+    public interface Spoiler {
+        String spoil(String rendered, final Expr expr, ExtendedRandom random);
     }
 }
