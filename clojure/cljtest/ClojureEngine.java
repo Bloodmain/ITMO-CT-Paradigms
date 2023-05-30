@@ -6,6 +6,8 @@ import jstest.Engine;
 import java.util.Optional;
 
 /**
+ * Clojure tests engine.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ClojureEngine implements Engine<Object> {

@@ -12,6 +12,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
+ * Prolog Map checker state.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class State<M> {

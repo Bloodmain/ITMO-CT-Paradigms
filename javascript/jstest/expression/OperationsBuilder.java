@@ -6,6 +6,8 @@ import java.util.function.DoubleBinaryOperator;
 import java.util.function.DoubleUnaryOperator;
 
 /**
+ * Operations builder.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public interface OperationsBuilder {

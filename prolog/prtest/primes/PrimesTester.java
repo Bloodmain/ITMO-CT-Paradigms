@@ -16,6 +16,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
+ * Tests for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#prolog-map">Prolog Primes</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class PrimesTester extends PrologTest {

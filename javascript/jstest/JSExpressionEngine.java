@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
+ * Expression-aware JavaScript engine.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class JSExpressionEngine implements Engine<Object> {

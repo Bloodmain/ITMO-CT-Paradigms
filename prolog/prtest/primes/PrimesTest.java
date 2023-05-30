@@ -12,6 +12,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
+ * Tests for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#prolog-map">Prolog Primes</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class PrimesTest {

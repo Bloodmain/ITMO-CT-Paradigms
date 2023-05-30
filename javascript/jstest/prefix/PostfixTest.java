@@ -6,6 +6,10 @@ import jstest.expression.Dialect;
 import static jstest.expression.Operations.*;
 
 /**
+ * Tests for Postfix* variants of
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#js-expression-parsing">JavaScript Expression Parsing</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class PostfixTest {

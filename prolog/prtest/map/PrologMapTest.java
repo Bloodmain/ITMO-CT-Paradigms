@@ -8,6 +8,10 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
+ * Common tests for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#prolog-map">Prolog Map</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class PrologMapTest extends PrologTest {

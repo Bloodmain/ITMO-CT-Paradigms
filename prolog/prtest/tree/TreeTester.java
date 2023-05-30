@@ -13,7 +13,9 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
- * Tests for <code>Basic</code> modification.
+ * Tester for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#prolog-map">Prolog Search Trees</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
  *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */

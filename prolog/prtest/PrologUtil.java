@@ -6,9 +6,11 @@ import alice.tuprolog.Theory;
 import base.TestCounter;
 
 /**
+ * Prolog utilities.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
-public class PrologUtil {
+public final class PrologUtil {
     private static final Term[] NO_TERMS = new Term[0];
     public static final Rule FIB_BENCHMARK = Rule.func("fib_benchmark", 1);
 

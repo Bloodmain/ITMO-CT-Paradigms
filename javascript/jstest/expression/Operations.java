@@ -7,6 +7,8 @@ import java.util.stream.DoubleStream;
 import java.util.stream.IntStream;
 
 /**
+ * Known expression operations.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public interface Operations {

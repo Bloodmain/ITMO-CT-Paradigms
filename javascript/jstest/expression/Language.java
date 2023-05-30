@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * Expression language.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class Language {

@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
+ * JavaScript engine.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class JSEngine {

@@ -15,6 +15,8 @@ import java.util.stream.Stream;
 import static jstest.expression.BaseVariant.c;
 
 /**
+ * Expression test builder.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class Builder implements OperationsBuilder, LanguageBuilder {

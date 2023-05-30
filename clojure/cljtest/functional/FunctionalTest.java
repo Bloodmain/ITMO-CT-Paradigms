@@ -5,6 +5,10 @@ import base.Selector;
 import static jstest.expression.Operations.*;
 
 /**
+ * Tests for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#clojure-functional-expressions">Clojure Functional Expressions</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class FunctionalTest {

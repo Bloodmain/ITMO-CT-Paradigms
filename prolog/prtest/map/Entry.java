@@ -3,6 +3,8 @@ package prtest.map;
 import prtest.Value;
 
 /**
+ * Prolog-aware analogue to {@link java.util.Map.Entry}.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class Entry {

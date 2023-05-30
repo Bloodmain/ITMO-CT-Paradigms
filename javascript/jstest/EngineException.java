@@ -1,6 +1,8 @@
 package jstest;
 
 /**
+ * Thrown on test engine error.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class EngineException extends RuntimeException {

@@ -5,6 +5,8 @@ import base.Asserts;
 import java.util.function.BiFunction;
 
 /**
+ * Test engine.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public interface Engine<X> {

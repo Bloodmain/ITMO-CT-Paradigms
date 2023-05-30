@@ -13,6 +13,8 @@ import static jstest.expression.BaseTester.EPS;
 import static jstest.expression.BaseTester.Test;
 
 /**
+ * Expression differentiator.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class Diff {

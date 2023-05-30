@@ -9,6 +9,8 @@ import java.util.function.DoubleUnaryOperator;
 import java.util.stream.Stream;
 
 /**
+ * Base expressions variant.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class BaseVariant implements Variant {

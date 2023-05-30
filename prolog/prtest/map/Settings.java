@@ -3,6 +3,8 @@ package prtest.map;
 import base.TestCounter;
 
 /**
+ * Prolog test settings.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class Settings {

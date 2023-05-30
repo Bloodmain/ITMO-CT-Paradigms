@@ -11,6 +11,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
+ * Tester for Broadcast variant of
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#clojure-linear">Linear Clojure</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class BroadcastTester extends LinearTester {

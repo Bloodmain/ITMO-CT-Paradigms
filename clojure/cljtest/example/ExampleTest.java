@@ -9,6 +9,9 @@ import jstest.Engine;
 import java.util.Arrays;
 
 /**
+ * Tests for Example Clojure
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class ExampleTest {

@@ -11,6 +11,9 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
+ * Tests for Example JavaScript
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class ExampleTest {

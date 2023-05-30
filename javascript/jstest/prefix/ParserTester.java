@@ -8,6 +8,10 @@ import jstest.expression.Language;
 import jstest.object.ObjectTester;
 
 /**
+ * Tester for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#js-expression-parsing">JavaScript Expression Parsing</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ParserTester extends ObjectTester {

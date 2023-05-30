@@ -19,6 +19,8 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 /**
+ * Clojure bridge.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public interface Item {

@@ -8,6 +8,8 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
+ * Base JavaScript tester.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class JSTester extends BaseTester<Object, JSExpressionEngine> {

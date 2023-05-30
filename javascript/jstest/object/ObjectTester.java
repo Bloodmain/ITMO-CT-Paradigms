@@ -10,6 +10,10 @@ import jstest.expression.Language;
 import java.nio.file.Path;
 
 /**
+ * Tester for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#js-functional-expressions">JavaScript Object Expressions</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ObjectTester extends JSTester {

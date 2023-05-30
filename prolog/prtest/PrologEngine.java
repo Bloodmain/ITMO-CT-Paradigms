@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Map;
 
 /**
+ * TuProlog engine.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class PrologEngine implements Engine<Value> {

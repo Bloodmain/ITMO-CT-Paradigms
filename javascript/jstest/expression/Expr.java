@@ -8,6 +8,8 @@ import java.util.function.IntFunction;
 import java.util.stream.Collectors;
 
 /**
+ * Expression instance.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class Expr {

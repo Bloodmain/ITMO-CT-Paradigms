@@ -4,6 +4,8 @@ import jstest.expression.BaseVariant;
 import jstest.expression.Expr;
 
 /**
+ * Basic arithmetics.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class ArithmeticVariant extends BaseVariant {

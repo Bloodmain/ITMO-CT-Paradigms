@@ -8,6 +8,10 @@ import jstest.functional.FunctionalTest;
 import static jstest.expression.Operations.*;
 
 /**
+ * Tests for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#js-object-expressions">JavaScript Object Expressions</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class ObjectTest {

@@ -7,6 +7,8 @@ import jstest.Engine;
 import java.nio.file.Path;
 
 /**
+ * Base Prolog tests.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public abstract class PrologTest extends Tester {

@@ -5,6 +5,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
+ * Expression dialect.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class Dialect {

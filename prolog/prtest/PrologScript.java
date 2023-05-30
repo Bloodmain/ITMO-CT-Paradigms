@@ -5,6 +5,7 @@ import alice.tuprolog.exceptions.NoMoreSolutionException;
 import alice.tuprolog.exceptions.NoSolutionException;
 import base.Asserts;
 import jstest.Engine;
+import jstest.EngineException;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
+ * Tested prolog script.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public class PrologScript {
@@ -39,8 +42,8 @@ public class PrologScript {
         consult(file);
     }
 
-    private static PrologException error(final Throwable cause, final String format, final Object... arguments) {
-        return new PrologException(String.format(format, arguments), cause);
+    private static EngineException error(final Throwable cause, final String format, final Object... arguments) {
+        return new EngineException(String.format(format, arguments), cause);
     }
 
     public void consult(final Path file) {
@@ -50,7 +53,7 @@ public class PrologScript {
             if (!test(CONSULT, Value.string(path.toString()))) {
                 throw error(null, "Error opening '%s'", path);
             }
-        } catch (final PrologException e) {
+        } catch (final EngineException e) {
             throw error(e, "Error opening '%s': %s", path, e.getMessage());
         }
     }

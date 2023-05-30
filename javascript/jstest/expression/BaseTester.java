@@ -14,6 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.ToDoubleFunction;
 
 /**
+ * Base expressions tester.
+ *
  * @author Niyaz Nigmatullin
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */

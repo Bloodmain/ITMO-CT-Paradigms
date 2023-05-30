@@ -11,13 +11,18 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
+ * Utility class for Clojure tests.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
-public class ClojureScript {
+public final class ClojureScript {
     public static final IFn LOAD_STRING = var("clojure.core/load-string");
     public static final IFn LOAD_FILE = asUser("load-file");
     public static final IFn LOAD_STRING_IN = asUser("load-string");
     public static Path CLOJURE_ROOT = Path.of(".");
+
+    private ClojureScript() {
+    }
 
     private static IFn asUser(final String function) {
         return (IFn) LOAD_STRING.invoke(
@@ -34,7 +39,7 @@ public class ClojureScript {
         LOAD_FILE.invoke(CLOJURE_ROOT.resolve(script).toString());
     }
 
-    protected static <T> Engine.Result<T> call(final IFn f, final Class<T> type, final String context, final Object[] args) {
+    static <T> Engine.Result<T> call(final IFn f, final Class<T> type, final String context, final Object[] args) {
         final Object result;
         try {
             result = callUnsafe(f, args);

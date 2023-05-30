@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.function.ToIntFunction;
 
 /**
+ * Tester for
+ * <a href="https://www.kgeorgiy.info/courses/paradigms/homeworks.html#clojure-expression-parsing">Clojure Expression Parsing</a>
+ * homework of <a href="https://www.kgeorgiy.info/courses/paradigms">Programming Paradigms</a> course.
+ *
  * @author Georgiy Korneev (kgeorgiy@kgeorgiy.info)
  */
 public final class ParserTester {
